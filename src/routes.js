@@ -4,13 +4,29 @@ import Base from './components/Base';
 import HomePage from './components/HomePage';
 import LoginPage from './containers/LoginPage';
 import SignUpPage from './containers/SignUpPage';
+import Auth from './modules/Auth';
+import DashboardPage from './containers/DashboardPage';
+
 
 export default (
 
-  <Route path="/" component={Base}>
+  <Route path="/" getComponent={(location, callback) => {
+        if (Auth.isUserAuthenticated()) {
+          callback(null, DashboardPage);
+        } else {
+          callback(null, HomePage);
+        }
+      }
+    } >
     <IndexRoute  component={HomePage}/>
     <Route path="/login" component={LoginPage}/>
     <Route path="/signup" component={SignUpPage}/>
+    <Route path="/logout" onEnter={(nextState, replace) => {
+        Auth.deauthenticateUser();
+
+        // change the current URL to /
+        replace('/');
+      }} />
   </Route>
 
 );
